@@ -9,21 +9,23 @@ local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.Place
 local requestfunc = syn and syn.request or request or http_request or http.request or fluxus and fluxus.request or game:HttpGet
 
 local function sendNotification(itemType, itemName)
-  local req = requestfunc({
-    Url = Webhook_URL,
-    Method = 'POST',
-    Headers = {
-      ['Content-Type'] = 'application/json'
-    },
-    Body = HttpService:JSONEncode({
-      ["content"] = "",
-      ["embeds"] = {{
-        ["title"] = "มีไอเท็มใหม่",
-        ["color"] = tonumber(0xFF0000),
-        ["description"] = "ประเภท: " .. itemType .. "\nชื่อ: " .. itemName
-      }}
+  if itemType and itemName then
+    local req = requestfunc({
+      Url = Webhook_URL,
+      Method = 'POST',
+      Headers = {
+        ['Content-Type'] = 'application/json'
+      },
+      Body = HttpService:JSONEncode({
+        ["content"] = "",
+        ["embeds"] = {{
+          ["title"] = "มีไอเท็มใหม่",
+          ["color"] = tonumber(0xFF0000),
+          ["description"] = "ประเภท: " .. itemType .. "\nชื่อ: " .. itemName
+        }}
+      })
     })
-  })
+  end
 end
 
 local backpack = game.Players.LocalPlayer.Backpack
