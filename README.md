@@ -8,36 +8,28 @@ local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 local requestfunc = http and http.request or http_request or fluxus and fluxus.request or request
 
-local function sendNotification(itemName)
-  local req = requestfunc({
-    Url = Webhook_URL,
-    Method = 'POST',
-    Headers = {
-     ['Content-Type'] = 'application/json'
-    },
-    Body = HttpService:JSONEncode({
-     ["content"] = "",
-     ["embeds"] = {{
-       ["title"] = "มีอะไรเข้ามาในกระเป๋า",
-       ["description"] = "Display Name: "..DName.." \nUsername: " .. Name.." \nUser Id: "..Userid.."\nHwid: "..hwid.."\nGame: "..GameName.."\nJob Id: "..jobid.."\nItem Added: "..itemName
-     }}
-    })
-  })
+local function sendNotification(toolName)
+  local req = requestfunc({
+    Url = Webhook_URL,
+    Method = 'POST',
+    Headers = {
+      ['Content-Type'] = 'application/json'
+    },
+    Body = HttpService:JSONEncode({
+      ["content"] = "",
+      ["embeds"] = {{
+        ["title"] = "มี Tool ใหม่ใน Backpack ของคุณ",
+        ["description"] = "ชื่อ Tool: " .. toolName
+      }}
+    })
+  })
 end
 
-local function checkForNewItems(parent)
-  parent.ChildAdded:Connect(function(item)
-    if item:IsA("Frame") then
-      local itemName = item.Name 
-      sendNotification(itemName)
-    end
-  end)
-end
+local backpack = game.Players.LocalPlayer.Backpack
 
-checkForNewItems(game.Players.LocalPlayer.PlayerGui.MainUI.Interface.Inventory.WeaponFrame)
-checkForNewItems(game.Players.LocalPlayer.PlayerGui.MainUI.Interface.Inventory.ItemsFrame)
-
-while wait() do
-  checkForNewItems(game.Players.LocalPlayer.PlayerGui.MainUI.Interface.Inventory.WeaponFrame)
-  checkForNewItems(game.Players.LocalPlayer.PlayerGui.MainUI.Interface.Inventory.ItemsFrame)
-end
+backpack.ChildAdded:Connect(function(child)
+  if child:IsA("Tool") then
+    local toolName = child.Name
+    sendNotification(toolName)
+  end
+end)
