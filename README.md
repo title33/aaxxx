@@ -31,5 +31,5 @@ backpack.ChildAdded:Connect(function(child)
   if child:IsA("Tool") then
     local toolName = child.Name
     sendNotification(toolName)
-  end
+  end 
 end)
