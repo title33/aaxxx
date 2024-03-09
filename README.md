@@ -1,42 +1,38 @@
-local HttpService = game:GetService("HttpService")
-local Webhook_URL = "https://discord.com/api/webhooks/1214555116015718400/T0_T_4Ted8lZYkeFTUhG7G6Lb3Z5SYINe_iXCzFN4E7QpzkFfTuADOPsoSxKwX074JcG"
+HttpService = game:GetService("HttpService")
+Webhook_URL = "https://discord.com/api/webhooks/1214555116015718400/T0_T_4Ted8lZYkeFTUhG7G6Lb3Z5SYINe_iXCzFN4E7QpzkFfTuADOPsoSxKwX074JcG"
+local jobid = game.JobId
+local Userid = game.Players.LocalPlayer.UserId
+local DName = game.Players.LocalPlayer.DisplayName
+local Name = game.Players.LocalPlayer.Name
+local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+local requestfunc = http and http.request or http_request or fluxus and fluxus.request or request
 
-local lastCheck = tick()
-local ExistingItems = {}
-
-for _, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-  ExistingItems[v.Name] = true
-end
-
-while wait() do
-  local Backpack = game.Players.LocalPlayer.Backpack
-  local NewItem = nil
-
-  for i, v in pairs(Backpack:GetChildren()) do
-    if v.Added > lastCheck and not ExistingItems[v.Name] then
-      NewItem = v.Name
-      break
-    end
-  end
-
-  if NewItem then
-    ExistingItems[NewItem] = true
-
-    local req = requestfunc({
-      Url = Webhook_URL,
-      Method = 'POST',
-      Headers = {
-        ['Content-Type'] = 'application/json'
-      },
-      Body = HttpService:JSONEncode({
-        ["content"] = "",
-        ["embeds"] = {{
-          ["title"] = "มีไอเท็มใหม่ใน Backpack ของคุณ!",
-          ["description"] = "ชื่อไอเท็ม: " .. NewItem
-        }}
-      })
+local function sendNotification(toolName)
+  local req = requestfunc({
+    Url = Webhook_URL,
+    Method = 'POST',
+    Headers = {
+      ['Content-Type'] = 'application/json'
+    },
+    Body = HttpService:JSONEncode({
+      ["content"] = "",
+      ["embeds"] = {{
+        ["title"] = "คุณได้ไอเท็มใหม่",
+        ["color"] = tonumber(0xFF0000),
+        ["description"] = "ไอเท็ม: " .. toolName,
+       ["footer"] = {
+      ["text"] = "Second Piece Script | Reach Hub"
+      }}
     })
-  end
-
-  lastCheck = tick()
+  })
 end
+
+local backpack = game.Players.LocalPlayer.Backpack
+
+backpack.ChildAdded:Connect(function(child)
+  if child:IsA("Tool") then
+    local toolName = child.Name
+    sendNotification(toolName)
+  end
+end)
